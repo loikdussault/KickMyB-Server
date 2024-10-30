@@ -17,10 +17,9 @@ import java.util.List;
 @Transactional
 public class ServiceTaskImpl implements ServiceTask {
 
-    @Autowired
-    MUserRepository repoUser;
+    @Autowired MUserRepository repoUser;
     @Autowired MTaskRepository repo;
-    private MPhotoRepository photoRepo;
+    @Autowired MPhotoRepository photoRepo;
     @Autowired MProgressEventRepository repoProgressEvent;
 
     @Override

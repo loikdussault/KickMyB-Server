@@ -25,7 +25,7 @@ public class ControllerTask {
     private ServiceTask serviceTask;
 
     @DeleteMapping(value = "/api/delete/{taskID}")
-    public @ResponseBody String deleteTask(@PathVariable long taskID) throws ServiceTask.UnauthorizedAccess, ServiceTask.TaskNotFound {
+    public @ResponseBody String hardDelete(@PathVariable long taskID) throws ServiceTask.UnauthorizedAccess, ServiceTask.TaskNotFound {
         System.out.println("KICKB SERVER : Deleting task ID: " + taskID);
         ConfigHTTP.attenteArticifielle();
         MUser user = currentUser();
