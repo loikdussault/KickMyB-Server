@@ -3,6 +3,7 @@ package org.kickmyb.server.task;
 import org.joda.time.DateTime;
 import org.kickmyb.server.account.MUser;
 import org.kickmyb.server.account.MUserRepository;
+import org.kickmyb.server.photo.MPhotoRepository;
 import org.kickmyb.transfer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ public class ServiceTaskImpl implements ServiceTask {
     @Autowired
     MUserRepository repoUser;
     @Autowired MTaskRepository repo;
+    private MPhotoRepository photoRepo;
     @Autowired MProgressEventRepository repoProgressEvent;
 
     @Override
@@ -35,6 +37,10 @@ public class ServiceTaskImpl implements ServiceTask {
 
         // Suppression logique : si vous souhaitez désactiver la tâche plutôt que de la supprimer physiquement, vous pouvez ajouter un champ `active` à MTask et le passer à `false` ici.
         // Exemple : taskToDelete.setActive(false);
+
+        if (taskToDelete.photo != null) {
+            photoRepo.delete(taskToDelete.photo);
+        }
 
         // Suppression physique :
         repo.delete(taskToDelete);
