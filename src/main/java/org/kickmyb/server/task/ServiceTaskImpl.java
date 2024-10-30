@@ -21,6 +21,11 @@ public class ServiceTaskImpl implements ServiceTask {
     @Autowired MTaskRepository repo;
     @Autowired MProgressEventRepository repoProgressEvent;
 
+    @Override
+    public void hardDelete(Long Taskid) {
+        repo.deleteById(Taskid);
+    }
+
     private int percentage(Date start, Date current, Date end){
         if (current.after(end)) return 100;
         long total = end.getTime() - start.getTime();

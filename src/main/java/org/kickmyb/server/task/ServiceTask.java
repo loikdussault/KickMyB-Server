@@ -12,6 +12,8 @@ public interface ServiceTask {
     class TooShort extends Exception {}
     class Empty extends Exception {}
 
+    void hardDelete(Long Taskid);
+
     // entity handling
     TaskDetailResponse detail(Long id, MUser user);
     void addOne(AddTaskRequest req, MUser user) throws Existing, Empty, TooShort;

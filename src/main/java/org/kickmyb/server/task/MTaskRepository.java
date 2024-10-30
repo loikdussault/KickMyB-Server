@@ -5,3 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MTaskRepository extends PagingAndSortingRepository<MTask, Long> { }
+
+
