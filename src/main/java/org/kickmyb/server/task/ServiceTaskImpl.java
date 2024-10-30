@@ -22,8 +22,22 @@ public class ServiceTaskImpl implements ServiceTask {
     @Autowired MProgressEventRepository repoProgressEvent;
 
     @Override
-    public void hardDelete(Long Taskid) {
-        repo.deleteById(Taskid);
+    @Transactional
+    public void hardDelete(Long taskID, MUser user) throws TaskNotFound, UnauthorizedAccess {
+        MTask taskToDelete = repo.findById(taskID).orElseThrow(TaskNotFound::new);
+
+        if (!user.tasks.contains(taskToDelete)) {
+            throw new UnauthorizedAccess();
+        }
+
+        user.tasks.remove(taskToDelete);
+        repoUser.save(user);
+
+        // Suppression logique : si vous souhaitez désactiver la tâche plutôt que de la supprimer physiquement, vous pouvez ajouter un champ `active` à MTask et le passer à `false` ici.
+        // Exemple : taskToDelete.setActive(false);
+
+        // Suppression physique :
+        repo.delete(taskToDelete);
     }
 
     private int percentage(Date start, Date current, Date end){

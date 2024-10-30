@@ -25,8 +25,12 @@ public class ControllerTask {
     private ServiceTask serviceTask;
 
     @DeleteMapping(value = "/api/delete/{taskID}")
-    public void deleteUser(@PathVariable long taskID) {
-
+    public @ResponseBody String deleteTask(@PathVariable long taskID) throws ServiceTask.UnauthorizedAccess, ServiceTask.TaskNotFound {
+        System.out.println("KICKB SERVER : Deleting task ID: " + taskID);
+        ConfigHTTP.attenteArticifielle();
+        MUser user = currentUser();
+        serviceTask.hardDelete(taskID, user);
+        return "";
     }
 
     @PostMapping(value = "/api/add", produces = "text/plain")
