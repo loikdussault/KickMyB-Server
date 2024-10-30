@@ -4,13 +4,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.kickmyb.server.ServerApplication;
-import org.kickmyb.server.account.BadCredentialsException;
 import org.kickmyb.server.account.MUser;
 import org.kickmyb.server.account.MUserRepository;
-import org.kickmyb.server.account.ServiceAccount;
+import org.kickmyb.server.task.MTask;
+import org.kickmyb.server.task.MTaskRepository;
 import org.kickmyb.server.task.ServiceTask;
 import org.kickmyb.transfer.AddTaskRequest;
-import org.kickmyb.transfer.SignupRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +21,7 @@ import java.util.Date;
 
 import static org.assertj.core.api.Fail.fail;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 // TODO pour celui ci on aimerait pouvoir mocker l'utilisateur pour ne pas avoir à le créer
 
@@ -36,10 +36,71 @@ class ServiceTaskTests {
     @Autowired
     private MUserRepository userRepository;
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
+    private MTaskRepository taskRepository;
     @Autowired
     private ServiceTask serviceTask;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
+    @Test
+    void testHardDeleteTask() throws ServiceTask.Empty, ServiceTask.TooShort, ServiceTask.Existing {
+        MUser u = createUser("M. Test");
+        AddTaskRequest atr = new AddTaskRequest();
+        atr.name = "Tâche de test";
+        atr.deadline = Date.from(new Date().toInstant().plusSeconds(3600));
+
+        // Ajouter une tâche
+        serviceTask.addOne(atr, u);
+        MTask task = taskRepository.findAll().iterator().next();
+
+        // Vérifier que la tâche est bien ajoutée
+        Assertions.assertTrue(taskRepository.findById(task.id).isPresent());
+
+        // Essayer de supprimer la tâche
+        try {
+            serviceTask.hardDelete(task.id, u);
+        } catch (ServiceTask.TaskNotFound e) {
+            fail("Échec du test : la tâche n'a pas été trouvée pour suppression.");
+        } catch (ServiceTask.UnauthorizedAccess e) {
+            fail("Échec du test : accès non autorisé pour supprimer la tâche.");
+        }
+
+        // Vérifier que la tâche est bien supprimée
+        boolean taskExists = taskRepository.findById(task.id).isPresent();
+        Assertions.assertFalse(taskExists, "La tâche n'a pas été supprimée correctement.");
+    }
+
+
+
+
+
+    @Test
+    void testHardDeleteTaskUnauthorized() throws ServiceTask.Empty, ServiceTask.TooShort, ServiceTask.Existing {
+        MUser user1 = createUser("User1");
+        MUser user2 = createUser("User2");
+
+        AddTaskRequest atr = new AddTaskRequest();
+        atr.name = "Tâche non autorisée";
+        atr.deadline = Date.from(new Date().toInstant().plusSeconds(3600));
+
+        // Ajouter une tâche pour user1
+        serviceTask.addOne(atr, user1);
+        MTask task = taskRepository.findAll().iterator().next();
+
+        // Essayer de supprimer la tâche avec user2 (devrait échouer)
+        ServiceTask.UnauthorizedAccess exception = assertThrows(ServiceTask.UnauthorizedAccess.class, () -> serviceTask.hardDelete(task.id, user2));
+        Assertions.assertNotNull(exception, "La suppression a été autorisée alors qu'elle n'aurait pas dû l'être.");
+    }
+
+
+    private MUser createUser(String username) {
+        MUser user = new MUser();
+        user.username = username;
+        user.password = passwordEncoder.encode("Passw0rd!");
+        userRepository.save(user);
+        return user;
+    }
 
     @Test
     void testAddTask() throws ServiceTask.Empty, ServiceTask.TooShort, ServiceTask.Existing {

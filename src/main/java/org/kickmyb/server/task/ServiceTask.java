@@ -16,6 +16,7 @@ public interface ServiceTask {
 
     void hardDelete(Long taskID, MUser user) throws TaskNotFound, UnauthorizedAccess;
 
+
     // entity handling
     TaskDetailResponse detail(Long id, MUser user);
     void addOne(AddTaskRequest req, MUser user) throws Existing, Empty, TooShort;

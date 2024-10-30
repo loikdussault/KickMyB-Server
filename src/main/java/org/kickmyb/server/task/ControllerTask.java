@@ -23,14 +23,25 @@ public class ControllerTask {
     // @Component qui implémente l'interface
     @Autowired
     private ServiceTask serviceTask;
-
     @DeleteMapping(value = "/api/delete/{taskID}")
+<<<<<<< Updated upstream
     public @ResponseBody String hardDelete(@PathVariable long taskID) throws ServiceTask.UnauthorizedAccess, ServiceTask.TaskNotFound {
+=======
+    public @ResponseBody String deleteTask(@PathVariable long taskID) {
+>>>>>>> Stashed changes
         System.out.println("KICKB SERVER : Deleting task ID: " + taskID);
         ConfigHTTP.attenteArticifielle();
         MUser user = currentUser();
-        serviceTask.hardDelete(taskID, user);
-        return "";
+        try {
+            serviceTask.hardDelete(taskID, user);
+            return "Tâche supprimée avec succès.";
+        } catch (ServiceTask.TaskNotFound e) {
+            return "Erreur : La tâche n'a pas été trouvée.";
+        } catch (ServiceTask.UnauthorizedAccess e) {
+            return "Erreur : Vous n'êtes pas autorisé à supprimer cette tâche.";
+        } catch (Exception e) {
+            return "Erreur inconnue lors de la suppression de la tâche.";
+        }
     }
 
     @PostMapping(value = "/api/add", produces = "text/plain")

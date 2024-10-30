@@ -24,6 +24,6 @@ public class MUser {
     public String password;
 
     // ORM style storage.
-    @OneToMany(fetch=FetchType.EAGER)
+    @OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
     public List<MTask> tasks = new ArrayList<>();
 }

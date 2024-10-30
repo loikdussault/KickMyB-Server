@@ -31,17 +31,16 @@ public class ServiceTaskImpl implements ServiceTask {
             throw new UnauthorizedAccess();
         }
 
+        // Supprimer la tâche de la liste de l'utilisateur
         user.tasks.remove(taskToDelete);
         repoUser.save(user);
 
-        // Suppression logique : si vous souhaitez désactiver la tâche plutôt que de la supprimer physiquement, vous pouvez ajouter un champ `active` à MTask et le passer à `false` ici.
-        // Exemple : taskToDelete.setActive(false);
-
+        // Supprimer la photo associée si elle existe
         if (taskToDelete.photo != null) {
             photoRepo.delete(taskToDelete.photo);
         }
 
-        // Suppression physique :
+        // Suppression physique de la tâche
         repo.delete(taskToDelete);
     }
 
