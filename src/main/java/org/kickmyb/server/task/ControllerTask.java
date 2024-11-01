@@ -28,16 +28,7 @@ public class ControllerTask {
         System.out.println("KICKB SERVER : Deleting task ID: " + taskID);
         ConfigHTTP.attenteArticifielle();
         MUser user = currentUser();
-        try {
-            serviceTask.hardDelete(taskID, user);
-            return "Tâche supprimée avec succès.";
-        } catch (ServiceTask.TaskNotFound e) {
-            return "Erreur : La tâche n'a pas été trouvée.";
-        } catch (ServiceTask.UnauthorizedAccess e) {
-            return "Erreur : Vous n'êtes pas autorisé à supprimer cette tâche.";
-        } catch (Exception e) {
-            return "Erreur inconnue lors de la suppression de la tâche.";
-        }
+        return "";
     }
 
     @PostMapping(value = "/api/add", produces = "text/plain")

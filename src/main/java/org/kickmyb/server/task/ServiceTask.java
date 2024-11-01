@@ -14,10 +14,11 @@ public interface ServiceTask {
     class TaskNotFound extends Exception {}
     class UnauthorizedAccess extends Exception {}
 
-    void hardDelete(Long taskID, MUser user) throws TaskNotFound, UnauthorizedAccess;
+
 
 
     // entity handling
+    void hardDelete(Long taskID, MUser user) throws TaskNotFound, UnauthorizedAccess;
     TaskDetailResponse detail(Long id, MUser user);
     void addOne(AddTaskRequest req, MUser user) throws Existing, Empty, TooShort;
     void updateProgress(long taskID, int value);

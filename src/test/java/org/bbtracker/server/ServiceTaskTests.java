@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -44,20 +45,18 @@ class ServiceTaskTests {
 
 
     @Test
+    @Transactional
     void testHardDeleteTask() throws ServiceTask.Empty, ServiceTask.TooShort, ServiceTask.Existing {
         MUser u = createUser("M. Test");
         AddTaskRequest atr = new AddTaskRequest();
         atr.name = "Tâche de test";
         atr.deadline = Date.from(new Date().toInstant().plusSeconds(3600));
 
-        // Ajouter une tâche
         serviceTask.addOne(atr, u);
         MTask task = taskRepository.findAll().iterator().next();
 
-        // Vérifier que la tâche est bien ajoutée
         Assertions.assertTrue(taskRepository.findById(task.id).isPresent());
 
-        // Essayer de supprimer la tâche
         try {
             serviceTask.hardDelete(task.id, u);
         } catch (ServiceTask.TaskNotFound e) {
@@ -66,7 +65,6 @@ class ServiceTaskTests {
             fail("Échec du test : accès non autorisé pour supprimer la tâche.");
         }
 
-        // Vérifier que la tâche est bien supprimée
         boolean taskExists = taskRepository.findById(task.id).isPresent();
         Assertions.assertFalse(taskExists, "La tâche n'a pas été supprimée correctement.");
     }
